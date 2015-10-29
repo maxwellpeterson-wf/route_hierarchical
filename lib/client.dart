@@ -448,6 +448,8 @@ class Router {
   final bool _useFragment;
   final Window _window;
   final Route root;
+  final _onRouteEnter =
+      new StreamController<RouteEnterEvent>.broadcast();
   final _onRouteStart =
       new StreamController<RouteStartEvent>.broadcast(sync: true);
   final bool sortRoutes;
@@ -490,6 +492,8 @@ class Router {
    * A stream of route calls.
    */
   Stream<RouteStartEvent> get onRouteStart => _onRouteStart.stream;
+
+  Stream<RouteEnterEvent> get onRouteEnter => _onRouteEnter.stream;
 
   /**
    * Finds a matching [Route] added with [addRoute], parses the path
@@ -631,6 +635,7 @@ class Router {
       base._currentRoute = matchedRoute.route;
       base._currentRoute._lastEvent = event;
       matchedRoute.route._onEnterController.add(event);
+      _onRouteEnter.add(event);
       base = matchedRoute.route;
     });
   }
